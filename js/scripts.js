@@ -11,6 +11,7 @@ let pokemonRepository = (function () {
   }
 
   function showDetails(pokemon) {
+    console.log(pokemon);
     loadDetails(pokemon).then(function () {
       let modalBody = $(".modal-body");
       let modalTitle = $(".modal-title");
@@ -25,9 +26,12 @@ let pokemonRepository = (function () {
 
       let heightElement = $("<p>" + "Height: " + pokemon.height + "</p>");
 
+      let types = $("<h3>" + pokemon.types + "</h3>");
+
       modalTitle.append(nameElement);
       modalBody.append(imageElement);
       modalBody.append(heightElement);
+      modalBody.append(types);
     });
   }
 
@@ -41,6 +45,7 @@ let pokemonRepository = (function () {
     button.setAttribute("data-target", "#pokemonModal"); // looks for id of pokemonModal
     listItem.appendChild(button);
     listItem.classList.add("group-list-item");
+    listItem.classList.add("list");
     pokemonList.appendChild(listItem);
     button.addEventListener("click", function () {
       showDetails(pokemon); // this will allow the modal to be displayed when pokemon button is clicked
@@ -75,7 +80,10 @@ let pokemonRepository = (function () {
       .then(function (details) {
         item.imageUrl = details.sprites.front_default;
         item.height = details.height;
-        item.types = details.types;
+        item.types = [];
+        details.types.forEach(function (typeItem) {
+          item.types.push(typeItem.type.name);
+        });
       })
       .catch(function (e) {
         console.error(e);
@@ -97,3 +105,24 @@ pokemonRepository.loadList().then(function () {
     pokemonRepository.addListItem(pokemon);
   });
 });
+
+function search() {
+  let input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("myUL");
+  li = ul.querySelectorAll(".list");
+  // console.log(li);
+  // console.log(li[0].querySelector("#test").getElementsByTagName("button")[0]);
+  // li = ul.getElementsByTagName("li");
+  for (i = 0; i < li.length; i++) {
+    a = li[i].getElementsByTagName("button")[0];
+    // console.log(a.innerText);
+    txtValue = a.textContent || a.innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
